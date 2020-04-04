@@ -2,7 +2,7 @@
 
 namespace Itbeard.Models
 {
-    public class UrlModel
+    public class UrlModel : StatusCodeModel
     {
         public Guid Id { get; set; }
         

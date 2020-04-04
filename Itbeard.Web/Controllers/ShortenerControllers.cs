@@ -1,3 +1,4 @@
+using System.Net;
 using System.Threading.Tasks;
 using Itbeard.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +20,8 @@ namespace Itbeard.Web.Controllers
         public async Task<IActionResult> Post(string url)
         {
             var result = await urlService.Reduce(url);
-            return Ok(result);
+
+            return StatusCode((int)result.StatusCode, result);
         }
         
         [HttpGet]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Itbeard.Data;
@@ -21,18 +22,28 @@ namespace Itbeard.Services
         
         public async Task<UrlModel> Reduce(string targetUrl)
         {
+            var oldUrl = await urlRepository.GetFirstWhereAsync( u => u.TargetUrl == targetUrl);
+            var urlModel = mapper.Map<UrlModel>(oldUrl);
+            if (oldUrl != null)
+            {
+                urlModel.StatusCode = HttpStatusCode.OK;
+                return urlModel;
+            }
+
             var url = new Url
             {
                 Id = Guid.NewGuid(),
                 ShortGuid = Guid.NewGuid().ToString().Substring(0, 7),
                 TargetUrl = targetUrl
             };
-            
+
             var result = await urlRepository.InsertAsync(url);
-            
-            return mapper.Map<UrlModel>(result);
+            urlModel = mapper.Map<UrlModel>(result);
+            urlModel.StatusCode = HttpStatusCode.Created;
+
+            return urlModel;
         }
-        
+
         public async Task<UrlModel> Get(string shortGuid)
         {
             var url = await urlRepository.GetFirstWhereAsync( u => u.ShortGuid.StartsWith(shortGuid));
